@@ -1,4 +1,4 @@
-![Screenshot 2023-10-15 174716](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/844a2966-3fb0-43ec-aaa8-8cab83b3c75b)## Day 1 - Digital Logic with TL-Verliog and Makerchip   
+## Day 1 - Digital Logic with TL-Verliog and Makerchip   
 
 <details>
   <summary> Combinational Logic in TL-Verilog using Makerchip </summary>
