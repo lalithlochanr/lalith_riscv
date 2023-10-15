@@ -23,6 +23,7 @@
 
 
 * Basic MUX implementation and Introduction to Makerchip
+  
 - MUX
    - A multiplexer is a digital electronic device or combinational circuit that selects one of several input data lines and forwards it to a single output line.
  ![Screenshot 2023-10-15 175225](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c2ebd8fb-61dc-4837-b9b8-d7e296a5dcca)
@@ -34,7 +35,8 @@
 - Makerchip
 ![Screenshot 2023-10-15 180103](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/2dc0e55d-c565-4c7e-920a-7781beebb0d2)
 
-* Labs for Combinational Logiv
+* Labs for Combinational Logic
+
 - Inverter
   ![Screenshot 2023-10-15 181638](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/565d056f-0a95-48a4-a19c-2013a96e8925)
 
