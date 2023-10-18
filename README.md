@@ -196,3 +196,94 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 
    
 </details>
+
+
+## Day 2 - Basic RISC-V CPU micro-architecture
+
+<details> 
+  <summary>Introduction to RISC-V Micro-architecture</summary> 
+
+* A single-cycle RISC-V processor is a simplified version of a RISC-V microprocessor where each instruction is executed within a single clock cycle. While this approach offers simplicity, it often results in slow performance. Nevertheless, it serves as a fundamental building block for understanding processor design. Here are the stages and key components of a single-cycle RISC-V processor:  
+
+1. Instruction Fetch (IF):  
+
+- The instruction fetch stage is the first stage in the processor's pipeline.  
+- The program counter (PC) holds the address of the current instruction to fetch.  
+- The PC is sent to the instruction memory, and the instruction at that address is fetched and placed into the instruction register (IR).  
+- The PC is incremented by 4 (since RISC-V instructions are typically 4 bytes in length) to prepare for the next instruction fetch.    
+
+2. Instruction Decode (ID):    
+
+-In this stage, the instruction in the IR is decoded.  
+- The opcode and other fields of the instruction are used to determine the operation to be performed.  
+- Register numbers and immediate values are extracted from the instruction.  
+
+3. Execution (EX):  
+
+- The execution stage performs the actual operation specified by the instruction.   
+- For R-type instructions (e.g., add, subtract), arithmetic and logical operations are performed using the values from the registers.  
+- For I-type instructions (e.g., load, store), address calculations are made.  
+- Control signals for the ALU (Arithmetic Logic Unit) are generated based on the instruction type.  
+
+4. Memory Access (MEM):    
+
+- This stage is responsible for reading from or writing to memory (e.g., data cache or RAM) in load and store instructions.  
+- For loads, the address calculated in the execution stage is used to read data from memory.  
+- For stores, the data to be written is placed in memory at the address calculated earlier.  
+- Other instructions typically perform no memory access.  
+
+5. Write-Back (WB):  
+
+- In the final stage, the results of the execution stage are written back to the register file.  
+- The destination register (specified in the instruction) is updated with the result.  
+- If the instruction is a load, the value read from memory is written to a register.  
+- The PC is updated with the next instruction address to prepare for the next cycle.  
+
+* In a single-cycle processor, each instruction goes through all of these stages within a single clock cycle.   
+
+![Screenshot 2023-10-18 155219](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8adc4ec3-3c64-4abb-9762-3212297a05fb)  
+
+![Screenshot 2023-10-18 155622](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8b53fa49-4b21-492f-90e1-ea2ece42cf75)
+
+![Screenshot 2023-10-18 160950](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/5949b52a-30b6-440e-8cb2-88ba417c4da9)
+
+</details>
+
+<details>
+  <summary> Fetch and Decode </summary>
+
+### Implementation and Lab for PC
+
+![Screenshot 2023-10-18 161830](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/97852378-3619-4f8f-b7d1-a35a0778fed8)
+
+![Screenshot 2023-10-18 162202](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/d1032b67-a973-4a03-87d5-15f0d8de61a5)
+
+![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/0194e1d9-2c12-49d0-ac28-f9cea76ad7ee)
+
+### Lab for Instruction Fetch Logic
+
+
+
+
+
+
+
+
+
+
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
