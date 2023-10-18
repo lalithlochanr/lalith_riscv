@@ -1,4 +1,4 @@
-Refer to the manual for any queeries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
+Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
 
 ## Day 1 - Digital Logic with TL-Verliog and Makerchip   
 
