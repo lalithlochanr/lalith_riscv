@@ -263,7 +263,8 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 ````
 ![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cd3d617c-fe0b-4396-b2df-6e862ab22d2c)
 
-![Screenshot 2023-10-18 184034](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/541b1a20-bdbc-4d36-bda0-cc50cce9889d)
+![Screenshot 2023-10-18 184034](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/08d033d4-99d6-4691-b41f-b5401b285841)
+
 
 
 ### Lab for Instruction Fetch Logic  
