@@ -1,28 +1,27 @@
-# RISC-V based MYTH
+# RISC-V based MYTH  
 
-![Screenshot 2023-10-18 225951](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7de79695-beb5-4c87-b6fb-becb7a8b935e)
+![Screenshot 2023-10-18 225951](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/1b95dd8e-dfd7-48b4-97cf-b2446243f23e)  
 
+Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop  
 
-Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
-
-## Day 1 - Digital Logic with TL-Verliog and Makerchip   
+## Day 1 - Digital Logic with TL-Verliog and Makerchip     
 
 <details>
   <summary> Combinational Logic in TL-Verilog using Makerchip </summary>
 
-  ### Introduction to Logic Gates
+  ### Introduction to Logic Gates  
 
- - Logic gates are fundamental building blocks of digital electronic circuits. They are simple devices or components that perform basic logical operations on binary data, which is composed of ones and zeros.  
+ - Logic gates are fundamental building blocks of digital electronic circuits. They are simple devices or components that perform basic logical operations on binary data, which is composed of ones and zeros.    
 
-    ![Screenshot 2023-10-15 174019](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/245b567c-c7ea-4c13-bb7c-e7af2de2a2c9)
+    ![Screenshot 2023-10-15 174019](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/245b567c-c7ea-4c13-bb7c-e7af2de2a2c9)  
 
 - Combinational Circuit
-  - A combinational circuit is a type of digital electronic circuit that produces an output based solely on the current values of its input signals, without any regard for previous inputs or a feedback mechanism.
-![Screenshot 2023-10-15 174426](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c4a30996-f181-45d2-a199-b35590e99f93)
+  - A combinational circuit is a type of digital electronic circuit that produces an output based solely on the current values of its input signals, without any regard for previous inputs or a feedback mechanism.  
+![Screenshot 2023-10-15 174426](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c4a30996-f181-45d2-a199-b35590e99f93)  
 
 - Adder
-  - An adder block in digital circuits is a specific combinational circuit designed to perform the arithmetic operation of addition and give the ouput of sum and carry on summing various input bits.
-![Screenshot 2023-10-15 174716](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/b6815708-4b5b-405c-8dfc-d80e9ceb671f)
+  - An adder block in digital circuits is a specific combinational circuit designed to perform the arithmetic operation of addition and give the ouput of sum and carry on summing various input bits.  
+![Screenshot 2023-10-15 174716](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/b6815708-4b5b-405c-8dfc-d80e9ceb671f)  
 
 - Boolean Opertaors
  - Operators are used to perform logical operations on two or more Boolean values.
