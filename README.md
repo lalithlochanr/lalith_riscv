@@ -1,4 +1,4 @@
-![image](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6f2e355c-5d16-4732-b454-73c8fb0f9d9a)Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
+Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
 
 ## Day 1 - Digital Logic with TL-Verliog and Makerchip   
 
