@@ -149,7 +149,7 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 <details>
   <summary> Validity </summary>
   
-### Introduction to Vaalidity and its Advantages 
+### Introduction to Validity and its Advantages 
 
 * Validity provides
   - Easier Debug
@@ -261,12 +261,10 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
          $pc[31:0] = >>1$reset ? 32'b0 :
                                  >>1$pc + 32'd4;
 ````
+![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cd3d617c-fe0b-4396-b2df-6e862ab22d2c)
 
-![Screenshot 2023-10-18 161830](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/97852378-3619-4f8f-b7d1-a35a0778fed8)
+![Screenshot 2023-10-18 184034](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/541b1a20-bdbc-4d36-bda0-cc50cce9889d)
 
-![Screenshot 2023-10-18 162202](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/d1032b67-a973-4a03-87d5-15f0d8de61a5)
-
-![Screenshot 2023-10-18 164521](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/bb6bbbbc-e229-40a7-a41a-89dc41dfd384)
 
 ### Lab for Instruction Fetch Logic  
 
@@ -288,7 +286,6 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
          $instr[31:0] = $imem_rd_data[31:0];
 |cpu
       m4+imem(@1)    // Args: (read stage)
-      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
 ````
 
 ![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/12f9a372-0f1b-49c7-a4d3-1e62f42b6de2)
@@ -445,17 +442,79 @@ Func3: 000
 ![Screenshot 2023-10-18 175928](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6817ecbb-44fc-41bf-9dc4-405f48693924)
 
 
+* Lab to Decode Individual Instruction
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];         
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+````
+![Screenshot 2023-10-18 180411](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cbc41058-b146-432d-8e51-4c2876a6fbf5)
+
+![Screenshot 2023-10-18 175928](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7c11f6d6-ba9f-4f0a-b43d-07a6ccda2a3d)
+
+</details>
+
+<details> 
+<summary> RISC-V Control Logic </summary>
+
+### Lab for Register file
 
 
 
 
-
-
-
-
-
-
-### Lab for Register File Read
 
 
 
@@ -467,8 +526,6 @@ Func3: 000
 
 
 </details>
-
-
 
 
 
