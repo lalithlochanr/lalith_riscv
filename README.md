@@ -880,10 +880,10 @@ Func3: 000
 
 </details>
 
-## Complete Pipelined RISC-V CPU micro-architecture
+## Day 5 - Complete Pipelined RISC-V CPU micro-architecture
 
 <details>
-  <summary> Complete Pipelined RISC-V CPU micro-architecture Pipelining the CPU </summary>
+  <summary> Pipelining the CPU </summary>
 
 ### Introduction to Control Flow Hazard and Read After Write Hazard
 
@@ -1002,28 +1002,130 @@ Func3: 000
       m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
       m4+cpu_viz(@4)    // visualisation
 ````
+- Take care of invalid signals
+  - Avoid writing RF for invalid instructions.
+  - Avoid redirecting PC for invalid (branch) instructions.
+    Introduce: $valid_taken_br = $valid && $taken_br; and use it in PC me
+  - Update inter-instruction dependency alignments (>>3).
+  - Debug until passing. Confirm save
+![Screenshot 2023-10-18 205401](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/916b70c3-8e15-4ec7-b202-65717e8353ee)  
 
-![Screenshot 2023-10-18 205401](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/916b70c3-8e15-4ec7-b202-65717e8353ee)
+
 
 
 ### Lab to Modify 3-Cycle RISC-V To Distribute Logic
 
 ````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                         >>3$valid_taken_br ? >>3$br_tgt_pc :
+                                 >>3$inc_pc;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+         $start = >>1$reset && !$reset;
+         $valid = $reset ? 1'b0 : $start ? 1'b1 :
+                                          >>3$valid;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1 
+         $inc_pc[31:0] = $pc + 32'd4;
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+      /xreg[31:0]
+         @3
+            $wr = |cpu$rf_wr_en && (|cpu$rf_wr_index != 5'b0) && (|cpu$rf_wr_index == #xreg);
+            $value[31:0] = |cpu$reset ? #xreg : 
+                                  $wr ? |cpu$rf_wr_data : $RETAIN;
+      @2
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_rd_index2[4:0] = $rs2;
+         ?$rf_rd_en1
+            $rf_rd_data1[31:0] = /xreg[$rf_rd_index1]>>2$value;
+         ?$rf_rd_en2
+            $rf_rd_data2[31:0] = /xreg[$rf_rd_index2]>>2$value;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
+         $br_tgt_pc[31:0] = $pc + $imm;
+      @3
+         $result[31:0] = $is_addi ? $src1_value + $imm :
+                          $is_add ? $src1_value + $src2_value :
+                                    32'bx;
+         $rf_wr_en = $rd_valid && $rd != 5'b0 && $valid;
+         $rf_wr_index[4:0] = $rd;
+         $rf_wr_data[31:0] = $result;
+         $taken_br = $is_beq ? ($src1_value == $src2_value) :
+                          $is_bne ? ($src1_value != $src2_value) :
+                          $is_blt ? (($src1_value < $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                          $is_bge ? (($src1_value >= $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                          $is_bltu ? ($src1_value < $src2_value) :
+                          $is_bgeu ? ($src1_value >= $src2_value) :
+                                          1'b0;
+         $valid_taken_br = $valid && $taken_br;
+         *passed = |cpu/xreg[10]>>3$value == (1+2+3+4+5+6+7+8+9);
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@2, @3)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+cpu_viz(@4)    //  visualisation
 
+````
 
-
-
-
-
-
-
-
-
-
+![Screenshot 2023-10-18 211816](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6021fb53-2c14-4708-a6b7-492b91d5ca12)
 
 
 </details>
 
+<details>
+  <summary> Solutions to Pipeline Hazards </summary>
+  
+</details>
 
 
 
