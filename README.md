@@ -252,15 +252,210 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 <details>
   <summary> Fetch and Decode </summary>
 
-### Implementation and Lab for PC
+### Implementation and Lab for PC  
+
+````
+  |cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+````
 
 ![Screenshot 2023-10-18 161830](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/97852378-3619-4f8f-b7d1-a35a0778fed8)
 
 ![Screenshot 2023-10-18 162202](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/d1032b67-a973-4a03-87d5-15f0d8de61a5)
 
-![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/0194e1d9-2c12-49d0-ac28-f9cea76ad7ee)
+![Screenshot 2023-10-18 164521](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/bb6bbbbc-e229-40a7-a41a-89dc41dfd384)
 
-### Lab for Instruction Fetch Logic
+### Lab for Instruction Fetch Logic  
+
+````
+  |cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+````
+
+![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/12f9a372-0f1b-49c7-a4d3-1e62f42b6de2)
+
+![Screenshot 2023-10-18 163518](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/06227861-911f-4d02-92a7-c52df8cf8ca8)
+
+![Screenshot 2023-10-18 164654](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/817d370e-7625-4790-a9de-ba156c183f96)  
+
+### RV Instruction Types IRSJBU and Decode Logic
+
+![Screenshot 2023-10-18 164746](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ec3e8e20-50f1-45af-ab36-0c07dde9a762)
+
+![Screenshot 2023-10-18 164758](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/1ef7496e-c324-4a2b-aa7b-1c4fdf4d74ba)
+
+![Screenshot 2023-10-18 164848](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cbe0504c-b91f-48fa-b114-eb7f982aab1f)
+
+- beq (Branch Equal):  
+
+Opcode: 1100011 (I-type)  
+Func3: 000  
+
+- bne (Branch Not Equal):  
+
+Opcode: 1100011 (I-type)  
+Func3: 001  
+
+-blt (Branch Less Than):  
+Opcode: 1100011 (I-type)  
+Func3: 100  
+
+-bge (Branch Greater Than or Equal):  
+Opcode: 1100011 (I-type)  
+Func3: 101  
+
+-bltu (Branch Less Than, Unsigned):  
+Opcode: 1100011 (I-type)  
+Func3: 110  
+
+-bgeu (Branch Greater Than or Equal, Unsigned):  
+Opcode: 1100011 (I-type)  
+Func3: 111  
+
+-add (Addition):  
+Opcode: 0110011 (R-type)  
+Func3: 000  
+
+-addi (Add Immediate):  
+Opcode: 0010011 (I-type)  
+Func3: 000  
+
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1[4:0] = $instr[19:15];
+         $rs2[4:0] = $instr[24:20];
+         $rd[4:0] = $instr[11:7];
+         $opcode[6:0] = $instr[6:0];
+         $funct7[6:0] = $instr[31:25];
+         $funct3[2:0] = $instr[14:12];
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+````
+
+![Screenshot 2023-10-18 174947](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/755f5f79-e970-42c6-a247-91955df38cbb)
+
+![Screenshot 2023-10-18 175102](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/75357a5c-7fce-4754-9ae0-2c6078c1173c)
+
+* Decode with Validity
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+````
+
+![Screenshot 2023-10-18 175243](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/842a86d4-9201-4558-85b9-864d492833c9)
+
+![Screenshot 2023-10-18 175928](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6817ecbb-44fc-41bf-9dc4-405f48693924)
+
+
+
+
+
+
+
+
+
+
+
+
+### Lab for Register File Read
 
 
 
