@@ -158,6 +158,7 @@ Refer to the manual for any queeries - https://github.com/stevehoover/RISC-V_MYT
   - Automated clock gating
 
 * Clock Gating
+  
 ![Screenshot 2023-10-18 123726](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8d7ef634-1d09-40a1-992e-281be0786129)
 
 ### Lab on Validity and Valid when Condition and  To compute Total Distance
