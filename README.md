@@ -1,3 +1,8 @@
+# RISC-V based MYTH
+
+![Screenshot 2023-10-18 225951](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7de79695-beb5-4c87-b6fb-becb7a8b935e)
+
+
 Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
 
 ## Day 1 - Digital Logic with TL-Verliog and Makerchip   
