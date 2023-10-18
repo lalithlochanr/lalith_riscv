@@ -880,10 +880,9 @@ Func3: 000
 
 </details>
 
+## Complete Pipelined RISC-V CPU micro-architecture
 <details>
-  <summary> Complete Pipelined RISC-V CPU micro-architecture </summary>
-  
-  ### Pipelining the CPU
+  <summary> Complete Pipelined RISC-V CPU micro-architecture Pipelining the CPU </summary>
 
   * Introduction to Control Flow Hazard and Read After Write Hazard
 
