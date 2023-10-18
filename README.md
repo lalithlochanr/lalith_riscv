@@ -171,11 +171,17 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 
 ![Screenshot 2023-10-18 130342](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ebc1b5a1-b495-49a9-ad11-3dcc5fb3627a)
 
+![Screenshot 2023-10-18 140957](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ad83088a-6c9a-4f05-8544-83727c4d677a)
+
+
 ### Lab on Calculator with Single Value Memory
 
 ![Screenshot 2023-10-18 133701](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/77385c19-7680-4b88-b988-c51b550b0129)
 
 ![Screenshot 2023-10-18 133108](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ccf0841e-fb89-414f-8476-776a39b7b191)
+
+![Screenshot 2023-10-18 141049](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c0868d06-b759-4a14-b15f-13d8d45ea61b)
+
   
 </details>
 
