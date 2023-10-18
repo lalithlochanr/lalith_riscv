@@ -1,4 +1,4 @@
-Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
+![image](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6f2e355c-5d16-4732-b454-73c8fb0f9d9a)Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
 
 ## Day 1 - Digital Logic with TL-Verliog and Makerchip   
 
@@ -271,6 +271,8 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 
 ### Lab for Instruction Fetch Logic  
 
+* m4+cpu_viz(@4)    // For visualisation, argument should be at least equal to the last stage of CPU logic. @4 would work for all labs.
+
 ````
   |cpu
       @0
@@ -382,6 +384,8 @@ Func3: 000
 
 ````
 
+![Screenshot 2023-10-18 192410](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/212f57cb-4aa8-4393-b932-d32dedfe360a)
+
 
 
 * Decode with Validity
@@ -435,12 +439,11 @@ Func3: 000
          $opcode[6:0] = $instr[6:0];
 |cpu
       m4+imem(@1)    // Args: (read stage)
-      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+
 ````
 
-![Screenshot 2023-10-18 175243](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/842a86d4-9201-4558-85b9-864d492833c9)
+![Screenshot 2023-10-18 192519](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/bd0258c0-3db2-4e13-924f-e97e095c9966)
 
-![Screenshot 2023-10-18 175928](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/6817ecbb-44fc-41bf-9dc4-405f48693924)
 
 
 * Lab to Decode Individual Instruction
@@ -501,30 +504,379 @@ Func3: 000
          $is_beq = $dec_bits ==? 11'bx_000_1100011;
          $is_addi = $dec_bits ==? 11'bx_000_0010011;
          $is_add = $dec_bits ==? 11'b0_000_0110011;
-````
-![Screenshot 2023-10-18 180411](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cbc41058-b146-432d-8e51-4c2876a6fbf5)
+|cpu
+      m4+imem(@1)    // Args: (read stage)
 
-![Screenshot 2023-10-18 175928](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7c11f6d6-ba9f-4f0a-b43d-07a6ccda2a3d)
+````
+
+![Screenshot 2023-10-18 193118](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/181707f4-1541-4c3e-8ad9-47369d63a812)
 
 </details>
 
 <details> 
 <summary> RISC-V Control Logic </summary>
 
-### Lab for Register file
+### Lab for Register file Read
+
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+         $rf_wr_en = 1'b0;
+         $rf_wr_index[4:0] = 5'b0;
+         $rf_wr_data[31:0] = 32'b0;
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+      /xreg[31:0]
+         @1
+            $wr = |cpu$rf_wr_en && (|cpu$rf_wr_index != 5'b0) && (|cpu$rf_wr_index == #xreg);
+            $value[31:0] = |cpu$reset ? #xreg : 
+                                  $wr ? |cpu$rf_wr_data : $RETAIN;
+      @1
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_rd_index2[4:0] = $rs2;
+         ?$rf_rd_en1
+            $rf_rd_data1[31:0] = /xreg[$rf_rd_index1]>>1$value;
+         ?$rf_rd_en2
+            $rf_rd_data2[31:0] = /xreg[$rf_rd_index2]>>1$value;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+cpu_viz(@4)    // For visualisation
+````
+  
+![Screenshot 2023-10-18 193624](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/e2efd428-5fd3-4b62-9859-be3c97334eca)
 
 
+### Lab for ALU operations (add/addi)
 
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+         $rf_wr_en = 1'b0;
+         $rf_wr_index[4:0] = 5'b0;
+         $rf_wr_data[31:0] = 32'b0;
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+      /xreg[31:0]
+         @1
+            $wr = |cpu$rf_wr_en && (|cpu$rf_wr_index != 5'b0) && (|cpu$rf_wr_index == #xreg);
+            $value[31:0] = |cpu$reset ? #xreg : 
+                                  $wr ? |cpu$rf_wr_data : $RETAIN;
+      @1
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_rd_index2[4:0] = $rs2;
+         ?$rf_rd_en1
+            $rf_rd_data1[31:0] = /xreg[$rf_rd_index1]>>1$value;
+         ?$rf_rd_en2
+            $rf_rd_data2[31:0] = /xreg[$rf_rd_index2]>>1$value;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
+         $result[31:0] = $is_addi ? $src1_value + $imm :
+                          $is_add ? $src1_value + $src2_value :
+                                    32'bx;
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+cpu_viz(@4)    // For visualisation
+````
+![Screenshot 2023-10-18 194141](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/1372cde7-2eb7-4a75-bd8c-34be3678e37f)
 
+### Lab for Register File Write
 
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+         $rf_wr_en = $rd_valid && $rd != 5'b0;
+         $rf_wr_index[4:0] = $rd;
+         $rf_wr_data[31:0] = $result;
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+      /xreg[31:0]
+         @1
+            $wr = |cpu$rf_wr_en && (|cpu$rf_wr_index != 5'b0) && (|cpu$rf_wr_index == #xreg);
+            $value[31:0] = |cpu$reset ? #xreg : 
+                                  $wr ? |cpu$rf_wr_data : $RETAIN;
+      @1
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_rd_index2[4:0] = $rs2;
+         ?$rf_rd_en1
+            $rf_rd_data1[31:0] = /xreg[$rf_rd_index1]>>1$value;
+         ?$rf_rd_en2
+            $rf_rd_data2[31:0] = /xreg[$rf_rd_index2]>>1$value;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
+         $result[31:0] = $is_addi ? $src1_value + $imm :
+                          $is_add ? $src1_value + $src2_value :
+                                    32'bx;
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+cpu_viz(@4)    // For visualisation
 
+````
 
+![Screenshot 2023-10-18 194403](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8c5818d8-d7a0-436e-8e9a-9b2a2b911e6f)  
 
+### Lab for Branch Instructions
 
-
-
-
-
+````
+|cpu
+      @0
+         $reset = *reset;
+         $pc[31:0] = >>1$reset ? 32'b0 :
+                         >>1$taken_br ? >>1$br_tgt_pc :
+                                 >>1$pc + 32'd4;
+         $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         $imem_rd_en = !$reset;
+      /imem[7:0]
+         @1
+            $instr[31:0] = *instrs\[#imem\];
+      ?$imem_rd_en
+         @1
+            $imem_rd_data[31:0] = /imem[$imem_rd_addr]$instr;
+      @1   
+         $instr[31:0] = $imem_rd_data[31:0];
+         $is_b_instr = $instr[6:2] ==? 5'b11000;
+         $is_r_instr = $instr[6:2] ==? 5'b01011 ||
+                          $instr[6:2] ==? 5'b011x0 ||
+                          $instr[6:2] ==? 5'b10100;
+         $is_j_instr = $instr[6:2] ==? 5'b11011;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                            $instr[6:2] ==? 5'b001x0 ||
+                            $instr[6:2] ==? 5'b11001;
+         $is_u_instr = $instr[6:2] ==? 5'b0x101;
+         $is_s_instr = $instr[6:2] ==? 5'b0100x;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $funct7_valid = $is_r_instr;
+         $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:20]} :
+                         $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:7]} :
+                         $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8], 1'b0} :
+                         $is_u_instr ? {$instr[31:12], 12'b0} :
+                         $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0} :
+                                     32'b0;
+         ?$rs1_valid
+            $rs1[4:0] = $instr[19:15];
+         ?$rs2_valid
+            $rs2[4:0] = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0] = $instr[11:7];
+         ?$funct3_valid
+            $funct3[2:0] = $instr[14:12];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         $opcode[6:0] = $instr[6:0];
+         $rf_wr_en = $rd_valid && $rd != 5'b0;
+         $rf_wr_index[4:0] = $rd;
+         $rf_wr_data[31:0] = $result;
+         $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
+         $is_bne = $dec_bits ==? 11'bx_001_1100011;
+         $is_bltu = $dec_bits ==? 11'bx_110_1100011;
+         $is_blt = $dec_bits ==? 11'bx_100_1100011;
+         $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         $is_bge = $dec_bits ==? 11'bx_101_1100011;
+         $is_beq = $dec_bits ==? 11'bx_000_1100011;
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
+         $is_add = $dec_bits ==? 11'b0_000_0110011;
+      /xreg[31:0]
+         @1
+            $wr = |cpu$rf_wr_en && (|cpu$rf_wr_index != 5'b0) && (|cpu$rf_wr_index == #xreg);
+            $value[31:0] = |cpu$reset ? #xreg : 
+                                  $wr ? |cpu$rf_wr_data : $RETAIN;
+      @1
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_rd_index2[4:0] = $rs2;
+         ?$rf_rd_en1
+            $rf_rd_data1[31:0] = /xreg[$rf_rd_index1]>>1$value;
+         ?$rf_rd_en2
+            $rf_rd_data2[31:0] = /xreg[$rf_rd_index2]>>1$value;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
+         $result[31:0] = $is_addi ? $src1_value + $imm :
+                          $is_add ? $src1_value + $src2_value :
+                                    32'bx;
+         $taken_br = $is_beq ? ($src1_value == $src2_value) :
+                          $is_bne ? ($src1_value != $src2_value) :
+                          $is_blt ? (($src1_value < $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                          $is_bge ? (($src1_value >= $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                          $is_bltu ? ($src1_value < $src2_value) :
+                          $is_bgeu ? ($src1_value >= $src2_value) :
+                                          1'b0;
+         $br_tgt_pc[31:0] = $pc + $imm;
+|cpu
+      m4+imem(@1)    // Args: (read stage)
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+cpu_viz(@4)    // For visualisation
+````
+![Screenshot 2023-10-18 194641](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/2429b540-44ee-4862-a6ab-699b3060b9cd)
 
 </details>
 
