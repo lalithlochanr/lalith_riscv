@@ -1,3 +1,5 @@
+Refer to the manual for any queeries - https://github.com/stevehoover/RISC-V_MYTH_Workshop
+
 ## Day 1 - Digital Logic with TL-Verliog and Makerchip   
 
 <details>
@@ -72,8 +74,69 @@
 * Fibonacci Sequence
   ![Screenshot 2023-10-18 074847](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/a2ece76b-4477-44cb-9fab-36e3ce1a6676)
 
-  ![Screenshot 2023-10-18 075252](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/a31f2bf4-1526-4b0c-8ef1-a388b29c0b6a)
+  ![Screenshot 2023-10-18 112047](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/9149d8d7-9a6f-4b98-9bd4-f334440f18a2)
 
+
+* Counter
+  ![Screenshot 2023-10-18 111450](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ad36133f-3ded-490b-85f4-4f4381b901c3)
+
+
+### Sequential Calculator Lab
+
+![Screenshot 2023-10-18 112250](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cb8a6827-4092-45bf-b51d-e4e973f3e48e)
+
+* Our simulator configuration:
+- will zero-extend or truncate when widths are mismatched (without warning)
+- uses 2-state simulation (no X's)
+
+![Screenshot 2023-10-18 112705](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/f3e409f9-514c-4f4e-80f7-268cdfe13d4d)
+
+</details>
+
+<details>
+  <summary> Pipelined Logic</summary>
+
+  ### Pipeline Logic and Re-Timing 
+  - Timing abstraction refers to simplifying the representation of digital circuits by focusing on signal delays and ignoring the internal behavior of logic gates, enabling designers to analyze and optimize circuits based on signal propagation times and clocking constraints
+
+
+![Screenshot 2023-10-18 113823](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8dc4d793-3224-45b3-95b8-eaf573d78a17)
+
+![Screenshot 2023-10-18 114045](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/fb58bb1d-43dd-4940-8d1d-92ba129a4fdd)
+
+- Using of TL-Verilog compared to System Verilog reduces code by 3.5 times.
+
+ ![Screenshot 2023-10-18 114223](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/2c75f3f6-1c93-438c-87a7-e2ecf58c4bb5)
+
+- whereas Re-Timing in System Verilog is very bug-prone!
+
+### Pipeline Logic Advantages and Demo in Platform
+
+* Pythagoras's Theorom
+* without Pipeline
+  ![Screenshot 2023-10-18 115524](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/2482a8a8-5f31-4813-a1fd-f98d92c631b1)
+* with Pipeline
+  ![Screenshot 2023-10-18 115612](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/be87a049-e1f9-48b6-a27c-82a629afd93e)
+  ![Screenshot 2023-10-18 115726](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ba25c2bf-acf7-4af9-bf2d-a58bae45f19c)
+
+- aa_sq 12 transactions ahead in the sense it has gone through 12 stages of flip-flops
+  ![Screenshot 2023-10-18 115950](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7a8f3f2f-5ba3-4e8a-90e5-742766167022)
+
+### Lab on Error Computations Within Computation Pipeline
+
+![Screenshot 2023-10-18 120421](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/edc487f9-39f6-422e-948e-1b1ce136f5c9)
+
+- Everything is in Pipeline in TL-Verilog even though it is not explicitly mentioned
+
+![Screenshot 2023-10-18 122007](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/66af786d-f42a-4e35-91c9-844cebf7ce7e)
+
+![Screenshot 2023-10-18 121814](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c74786d0-01d0-4052-aed4-a0c6ff9d47eb)
+
+### Lab on 2-Cycle Calculator
+
+![Screenshot 2023-10-18 122345](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/93011181-6caa-4b1f-b1de-bfc985fc3dd7)
+
+![Screenshot 2023-10-18 122719](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c43c4751-4a7f-4448-a4fe-91daed81bbc4)
 
 </details>
 
