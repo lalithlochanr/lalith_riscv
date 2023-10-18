@@ -261,7 +261,9 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
          $pc[31:0] = >>1$reset ? 32'b0 :
                                  >>1$pc + 32'd4;
 ````
-![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/cd3d617c-fe0b-4396-b2df-6e862ab22d2c)
+
+![Screenshot 2023-10-18 161830](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/b4db7a8b-bb50-44b5-85ad-111e84cd271d)
+
 
 ![Screenshot 2023-10-18 184034](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/08d033d4-99d6-4691-b41f-b5401b285841)
 
@@ -288,12 +290,10 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 |cpu
       m4+imem(@1)    // Args: (read stage)
 ````
+![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/a5e9e23c-904b-4905-94c1-d083bfbc9add)
 
-![Screenshot 2023-10-18 162407](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/12f9a372-0f1b-49c7-a4d3-1e62f42b6de2)
+![Screenshot 2023-10-18 190728](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/306a2868-b6d5-4556-b169-9a44c82c09fb)
 
-![Screenshot 2023-10-18 163518](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/06227861-911f-4d02-92a7-c52df8cf8ca8)
-
-![Screenshot 2023-10-18 164654](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/817d370e-7625-4790-a9de-ba156c183f96)  
 
 ### RV Instruction Types IRSJBU and Decode Logic
 
@@ -337,6 +337,8 @@ Func3: 000
 Opcode: 0010011 (I-type)  
 Func3: 000  
 
+* Instruction Decode
+
 ````
 |cpu
       @0
@@ -377,12 +379,10 @@ Func3: 000
                                      32'b0;
 |cpu
       m4+imem(@1)    // Args: (read stage)
-      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+
 ````
 
-![Screenshot 2023-10-18 174947](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/755f5f79-e970-42c6-a247-91955df38cbb)
 
-![Screenshot 2023-10-18 175102](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/75357a5c-7fce-4754-9ae0-2c6078c1173c)
 
 * Decode with Validity
 ````
