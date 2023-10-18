@@ -139,5 +139,51 @@ Refer to the manual for any queeries - https://github.com/stevehoover/RISC-V_MYT
 
 ![Screenshot 2023-10-18 122719](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c43c4751-4a7f-4448-a4fe-91daed81bbc4)
 
+![Screenshot 2023-10-18 123238](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/1743108d-8d33-4925-b006-69b44a69b611)
+
+![Screenshot 2023-10-18 123252](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7dea2789-39c0-4c91-b1c9-19613806e744)
+
 </details>
 
+<details>
+  <summary> Validity </summary>
+  
+### Introduction to Vaalidity and its Advantages 
+
+* Validity provides
+  - Easier Debug
+  - Cleaner Design
+  - Better Error Checking
+  - Automated clock gating
+
+* Clock Gating
+![Screenshot 2023-10-18 123726](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/8d7ef634-1d09-40a1-992e-281be0786129)
+
+### Lab on Validity and Valid when Condition and  To compute Total Distance
+
+![Screenshot 2023-10-18 125321](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/4f61cc64-1012-4c62-a6e0-ca3c80b0daa1)
+
+### Lab on 2-Cycle Calculator with Validity
+
+![Screenshot 2023-10-18 133650](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/c1f2e2ff-deff-4176-b409-4065f39e02a8)
+
+![Screenshot 2023-10-18 130342](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ebc1b5a1-b495-49a9-ad11-3dcc5fb3627a)
+
+### Lab on Calculator with Single Value Memory
+
+![Screenshot 2023-10-18 133701](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/77385c19-7680-4b88-b988-c51b550b0129)
+
+![Screenshot 2023-10-18 133108](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/ccf0841e-fb89-414f-8476-776a39b7b191)
+  
+</details>
+
+<details>
+  <summary> Wrap-Up </summary>
+ 
+  * Heirarchy
+  
+  ![Screenshot 2023-10-18 133838](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/d72002e9-f6d3-4f26-95fa-8620f507ca5f)
+-Lexical re-entrance refers to a programming or parsing concept where a function or module can be safely reinvoked, even while a prior call is still in progress, without causing conflicts or interference in the program's execution, allowing for efficient multitasking and recursion.
+
+   
+</details>
