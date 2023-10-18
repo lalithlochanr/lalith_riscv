@@ -881,12 +881,14 @@ Func3: 000
 </details>
 
 ## Complete Pipelined RISC-V CPU micro-architecture
+
 <details>
   <summary> Complete Pipelined RISC-V CPU micro-architecture Pipelining the CPU </summary>
 
-  * Introduction to Control Flow Hazard and Read After Write Hazard
+### Introduction to Control Flow Hazard and Read After Write Hazard
 
   - Pipelining allows multiple instructions to be processed simultaneously, breaking down the execution of instructions into several stages that are executed in parallel.
+    
       ![Screenshot 2023-10-18 203255](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/066baf99-8d7f-4212-a87a-bacdd2ac075a)
 
    ![Screenshot 2023-10-18 203314](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/7f6df6d8-57e6-4ab0-9512-bea5a9df732e)
@@ -902,6 +904,7 @@ Func3: 000
   - A read-after-write hazard, also known as a data hazard, happens when an instruction depends on the result of a prior instruction that has not yet completed its execution and written its result to the destination register. This hazard can lead to incorrect results or pipeline stalls, as the dependent instruction must wait for the data it needs to be available before it can proceed. Forwarding or data forwarding techniques can be used to mitigate RAW hazards.
  
 ### Lab to create 3-Cycle Valid Signal  
+
 ````
 |cpu
       @0
@@ -997,11 +1000,15 @@ Func3: 000
 |cpu
       m4+imem(@1)    // Args: (read stage)
       m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
-      m4+cpu_viz(@4)    // For visualisation
+      m4+cpu_viz(@4)    // visualisation
 ````
-![Screenshot 2023-10-18 204623](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/d5358fd9-e850-451e-93aa-d2459f4ea69d)
+
+![Screenshot 2023-10-18 205401](https://github.com/lalithlochanr/lalith_riscv/assets/108328466/916b70c3-8e15-4ec7-b202-65717e8353ee)
 
 
+### Lab to Modify 3-Cycle RISC-V To Distribute Logic
+
+````
 
 
 
