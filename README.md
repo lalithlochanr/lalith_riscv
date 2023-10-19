@@ -4,7 +4,7 @@
 
 Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH_Workshop  
 
-## Day 1 - Digital Logic with TL-Verliog and Makerchip     
+## Digital Logic with TL-Verliog and Makerchip     
 
 <details>
   <summary> Combinational Logic in TL-Verilog using Makerchip </summary>
@@ -202,7 +202,7 @@ Refer to the manual for any queries - https://github.com/stevehoover/RISC-V_MYTH
 </details>
 
 
-## Day 2 - Basic RISC-V CPU micro-architecture
+## Basic RISC-V CPU micro-architecture
 
 <details> 
   <summary>Introduction to RISC-V Micro-architecture</summary> 
@@ -884,7 +884,7 @@ Func3: 000
 
 </details>
 
-## Day 5 - Complete Pipelined RISC-V CPU micro-architecture
+## Complete Pipelined RISC-V CPU micro-architecture
 
 <details>
   <summary> Pipelining the CPU </summary>
